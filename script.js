@@ -1,35 +1,58 @@
 // スクロールアニメーション
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+    // ハンバーガーメニューの制御
+    const menuToggle = document.querySelector('.menu-toggle');
+    const nav = document.querySelector('.nav');
+    const navLinks = document.querySelectorAll('.nav a');
+
+    menuToggle.addEventListener('click', function() {
+        menuToggle.classList.toggle('active');
+        nav.classList.toggle('active');
+    });
+
+    // ナビゲーションリンクをクリックしたらメニューを閉じる
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            menuToggle.classList.remove('active');
+            nav.classList.remove('active');
+        });
+    });
+
+    // スムーズスクロール
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const headerHeight = document.querySelector('.header').offsetHeight;
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // スクロールアニメーション
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('animate');
-                // 一度表示された要素は監視を停止
                 observer.unobserve(entry.target);
             }
         });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px' // 下部のマージンを追加して、少し早めにアニメーションを開始
-    });
+    }, observerOptions);
 
-    // アニメーションを適用する要素を選択
-    document.querySelectorAll('.section, .feature-card, .plan-card').forEach(element => {
+    // アニメーション対象の要素を監視
+    document.querySelectorAll('.section, .feature-card, .plan-card, .pain-point-card, .pain-points-image-container, .about-image-container, .about-text').forEach(element => {
         observer.observe(element);
-    });
-});
-
-// スムーズスクロール
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
     });
 });
 
